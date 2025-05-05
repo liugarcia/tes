@@ -2,15 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Reown Connect</title>
+    <title>Conectar Carteira</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
-    <h1>Conectar Carteira</h1>
-    <button id="open-connect-modal">Conectar</button>
-    <button id="open-network-modal">Selecionar Rede</button>
+    <h1>Conectar Carteira com WalletConnect</h1>
+    <button id="connect-btn">Conectar Carteira</button>
+    <p id="wallet-address">Carteira não conectada</p>
 
-    <!-- Carregando os pacotes via CDN (reown + wagmi) -->
-    <script type="module" src="main.js"></script>
+    <!-- Carregando Web3Modal via CDN -->
+    <script src="https://unpkg.com/web3modal@2.5.1/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="main.js" type="module"></script>
   </body>
 </html>
