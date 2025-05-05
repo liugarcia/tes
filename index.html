@@ -4,10 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blokiox - Conectar Carteira</title>
-    <script src="https://cdn.jsdelivr.net/npm/@reown/appkit@latest/dist/reown-appkit.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-wagmi@latest/dist/reown-appkit-adapter-wagmi.umd.min.js"></script>
+    <!-- Carrega as dependências via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/universal-provider@2.8.0/dist/umd/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@reown/appkit@latest/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-wagmi@latest/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/viem@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/wagmi@latest"></script>
     <style>
-        /* Seus estilos aqui */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #3b99fc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2a7ed5;
+        }
+        #walletInfo {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        h1 {
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -26,60 +68,71 @@
     </div>
 
     <script>
-        // Configuração do projeto
-        const projectId = 'b8b153f3d90c148517ecb92b997dfcab';
-        
-        // Obter redes do objeto global
-        const { mainnet, arbitrum } = ReownAppkit.networks;
-        
-        // Configurar o adaptador Wagmi
-        const wagmiAdapter = new ReownAppkitAdapterWagmi.WagmiAdapter({
-            projectId,
-            networks: [mainnet, arbitrum]
-        });
+        // Verifica se todas as dependências foram carregadas
+        if (!window.ReownAppkit || !window.ReownAppkitAdapterWagmi) {
+            console.error('Bibliotecas não carregadas corretamente');
+            alert('Erro ao carregar as dependências. Por favor, recarregue a página.');
+        } else {
+            console.log('Todas as dependências foram carregadas:', {
+                ReownAppkit: window.ReownAppkit,
+                ReownAppkitAdapterWagmi: window.ReownAppkitAdapterWagmi
+            });
+            
+            // Configuração do projeto
+            const projectId = 'b8b153f3d90c148517ecb92b997dfcab';
+            
+            // Usa as redes do objeto global corretamente
+            const { mainnet, arbitrum } = window.ReownAppkit.networks;
+            
+            // Configura o adaptador Wagmi
+            const wagmiAdapter = new window.ReownAppkitAdapterWagmi.WagmiAdapter({
+                projectId,
+                networks: [mainnet, arbitrum]
+            });
 
-        // Configurar metadados
-        const metadata = {
-            name: 'blokiox',
-            description: 'AppKit Example',
-            url: window.location.origin,
-            icons: ['https://assets.reown.com/reown-profile-pic.png']
-        };
-
-        // Criar o modal
-        const modal = ReownAppkit.createAppKit({
-            adapters: [wagmiAdapter],
-            networks: [mainnet, arbitrum],
-            metadata,
-            projectId,
-            features: {
-                analytics: true
-            }
-        });
-
-        // Configurar botões
-        document.getElementById('open-connect-modal').addEventListener('click', () => modal.open());
-        document.getElementById('open-network-modal').addEventListener('click', () => modal.open({ view: 'Networks' }));
-
-        // Ouvir eventos
-        modal.subscribe('connect', (data) => {
-            console.log('Conectado:', data);
-            document.getElementById('walletAddress').textContent = data.address;
-            document.getElementById('walletChain').textContent = getNetworkName(data.chainId);
-            document.getElementById('walletInfo').style.display = 'block';
-        });
-
-        modal.subscribe('disconnect', () => {
-            console.log('Desconectado');
-            document.getElementById('walletInfo').style.display = 'none';
-        });
-
-        function getNetworkName(chainId) {
-            const networks = {
-                1: "Ethereum Mainnet",
-                42161: "Arbitrum One"
+            // Configura metadados
+            const metadata = {
+                name: 'blokiox',
+                description: 'AppKit Example',
+                url: window.location.origin,
+                icons: ['https://assets.reown.com/reown-profile-pic.png']
             };
-            return networks[chainId] || `Unknown Network (ID: ${chainId})`;
+
+            // Cria o modal
+            const modal = window.ReownAppkit.createAppKit({
+                adapters: [wagmiAdapter],
+                networks: [mainnet, arbitrum],
+                metadata,
+                projectId,
+                features: {
+                    analytics: true
+                }
+            });
+
+            // Configura botões
+            document.getElementById('open-connect-modal').addEventListener('click', () => modal.open());
+            document.getElementById('open-network-modal').addEventListener('click', () => modal.open({ view: 'Networks' }));
+
+            // Ouvir eventos
+            modal.subscribe('connect', (data) => {
+                console.log('Conectado:', data);
+                document.getElementById('walletAddress').textContent = data.address;
+                document.getElementById('walletChain').textContent = getNetworkName(data.chainId);
+                document.getElementById('walletInfo').style.display = 'block';
+            });
+
+            modal.subscribe('disconnect', () => {
+                console.log('Desconectado');
+                document.getElementById('walletInfo').style.display = 'none';
+            });
+
+            function getNetworkName(chainId) {
+                const networks = {
+                    1: "Ethereum Mainnet",
+                    42161: "Arbitrum One"
+                };
+                return networks[chainId] || `Unknown Network (ID: ${chainId})`;
+            }
         }
     </script>
 </body>
