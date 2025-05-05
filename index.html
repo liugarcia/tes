@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conexão com Carteira Cripto</title>
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.3/dist/web3.min.js"></script>
+    <title>Blokiox - Conectar Carteira</title>
+    <script type="module" src="main.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,10 +42,6 @@
             background-color: #f9f9f9;
             display: none;
         }
-        #qrCodeContainer {
-            margin: 20px auto;
-            max-width: 300px;
-        }
         h1 {
             color: #333;
         }
@@ -54,13 +49,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Conexão com Carteira Cripto</h1>
-        <p>Conecte sua carteira para interagir com nosso serviço</p>
+        <h1>Blokiox - Conectar Carteira</h1>
+        <p>Conecte sua carteira para começar</p>
         
-        <button id="connectButton">Conectar Carteira</button>
-        <button id="disconnectButton" style="display: none;">Desconectar</button>
-        
-        <div id="qrCodeContainer"></div>
+        <button id="open-connect-modal">Conectar Carteira</button>
+        <button id="open-network-modal">Trocar Rede</button>
         
         <div id="walletInfo">
             <h3>Informações da Carteira</h3>
@@ -68,104 +61,5 @@
             <p><strong>Rede:</strong> <span id="walletChain"></span></p>
         </div>
     </div>
-
-    <script>
-        // Configuração do WalletConnect
-        const projectId = "b8b153f3d90c148517ecb92b997dfcab";
-        let provider = null;
-        let web3 = null;
-        
-        document.getElementById('connectButton').addEventListener('click', connectWallet);
-        document.getElementById('disconnectButton').addEventListener('click', disconnectWallet);
-        
-        async function connectWallet() {
-            try {
-                // Criar provider WalletConnect
-                provider = new WalletConnectProvider.default({
-                    projectId: projectId,
-                    chains: [1], // Ethereum Mainnet
-                    showQrModal: true,
-                    qrModalOptions: {
-                        themeVariables: {
-                            '--wcm-z-index': '9999'
-                        }
-                    }
-                });
-                
-                // Habilitar a conexão
-                await provider.enable();
-                
-                // Criar instância Web3
-                web3 = new Web3(provider);
-                
-                // Obter contas
-                const accounts = await web3.eth.getAccounts();
-                const chainId = await web3.eth.getChainId();
-                
-                // Exibir informações
-                document.getElementById('walletAddress').textContent = accounts[0];
-                document.getElementById('walletChain').textContent = getNetworkName(chainId);
-                document.getElementById('walletInfo').style.display = 'block';
-                
-                // Alternar botões
-                document.getElementById('connectButton').style.display = 'none';
-                document.getElementById('disconnectButton').style.display = 'inline-block';
-                
-                // Ouvir eventos de desconexão
-                provider.on("disconnect", (code, reason) => {
-                    console.log("Desconectado:", code, reason);
-                    disconnectWallet();
-                });
-                
-                // Ouvir mudanças de conta
-                provider.on("accountsChanged", (accounts) => {
-                    document.getElementById('walletAddress').textContent = accounts[0];
-                });
-                
-                // Ouvir mudanças de rede
-                provider.on("chainChanged", (chainId) => {
-                    document.getElementById('walletChain').textContent = getNetworkName(chainId);
-                });
-                
-                console.log("Conectado com sucesso!", accounts);
-                
-            } catch (error) {
-                console.error("Erro ao conectar carteira:", error);
-                alert("Erro ao conectar carteira: " + error.message);
-            }
-        }
-        
-        function disconnectWallet() {
-            if (provider) {
-                provider.disconnect();
-            }
-            
-            // Resetar interface
-            document.getElementById('walletInfo').style.display = 'none';
-            document.getElementById('connectButton').style.display = 'inline-block';
-            document.getElementById('disconnectButton').style.display = 'none';
-            
-            provider = null;
-            web3 = null;
-            
-            console.log("Desconectado com sucesso");
-        }
-        
-        function getNetworkName(chainId) {
-            const networks = {
-                1: "Ethereum Mainnet",
-                5: "Goerli Testnet",
-                137: "Polygon Mainnet",
-                56: "Binance Smart Chain",
-                42161: "Arbitrum One",
-                10: "Optimism",
-                100: "Gnosis Chain",
-                43114: "Avalanche C-Chain",
-                250: "Fantom Opera"
-            };
-            
-            return networks[chainId] || `Unknown Network (ID: ${chainId})`;
-        }
-    </script>
 </body>
 </html>
