@@ -1,37 +1,22 @@
-import { createAppKit } from 'https://unpkg.com/@reown/appkit@latest/dist/index.mjs'
-import { mainnet, arbitrum } from 'https://unpkg.com/@reown/appkit@latest/dist/networks/index.mjs'
-import { WagmiAdapter } from 'https://unpkg.com/@reown/appkit-adapter-wagmi@latest/dist/index.mjs'
+import { EthereumProvider } from "https://unpkg.com/@walletconnect/ethereum-provider@2.11.4/dist/esm/index.js";
 
-// Seu Project ID do Reown Cloud
-const projectId = 'b8b153f3d90c148517ecb92b997dfcab'
+const connectButton = document.getElementById("connect-btn");
+const walletDisplay = document.getElementById("wallet-address");
 
-const wagmiAdapter = new WagmiAdapter({
-  projectId,
-  networks: [mainnet, arbitrum]
-})
+// Configurar o WalletConnect com seu projectId
+const provider = await EthereumProvider.init({
+  projectId: "b8b153f3d90c148517ecb92b997dfcab", // Substitua pelo seu se quiser
+  chains: [1], // Ethereum Mainnet
+  showQrModal: true,
+});
 
-const metadata = {
-  name: 'blokiox',
-  description: 'AppKit Example',
-  url: 'https://reown.com/appkit',
-  icons: ['https://assets.reown.com/reown-profile-pic.png']
-}
-
-const modal = createAppKit({
-  adapters: [wagmiAdapter],
-  networks: [mainnet, arbitrum],
-  metadata,
-  projectId,
-  features: {
-    analytics: true
+connectButton.addEventListener("click", async () => {
+  try {
+    await provider.enable(); // Abre QR Code
+    const accounts = await provider.request({ method: "eth_accounts" });
+    walletDisplay.textContent = `Carteira: ${accounts[0]}`;
+  } catch (err) {
+    console.error("Erro ao conectar", err);
+    walletDisplay.textContent = "Erro ao conectar";
   }
-})
-
-// Espera o DOM carregar antes de adicionar eventos
-window.addEventListener('DOMContentLoaded', () => {
-  const openConnectModalBtn = document.getElementById('open-connect-modal')
-  const openNetworkModalBtn = document.getElementById('open-network-modal')
-
-  openConnectModalBtn?.addEventListener('click', () => modal.open())
-  openNetworkModalBtn?.addEventListener('click', () => modal.open({ view: 'Networks' }))
-})
+});
