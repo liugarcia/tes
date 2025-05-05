@@ -1,37 +1,29 @@
-import { createAppKit } from '@reown/appkit'
-import { mainnet, arbitrum } from '@reown/appkit/networks'
-import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { EthereumProvider } from "https://unpkg.com/@walletconnect/ethereum-provider@2.11.4/dist/esm/index.js"
 
-const projectId = 'b8b153f3d90c148517ecb92b997dfcab' // substitua com o seu se necessário
+const connectButton = document.getElementById("connect-btn")
+const addressDisplay = document.getElementById("wallet-address")
 
-const networks = [mainnet, arbitrum]
-
-const wagmiAdapter = new WagmiAdapter({
-  projectId,
-  networks
+// Configuração do WalletConnect Provider
+const provider = await EthereumProvider.init({
+  projectId: "b8b153f3d90c148517ecb92b997dfcab", // Seu project ID do WalletConnect Cloud
+  chains: [1], // Ethereum Mainnet
+  showQrModal: true,
 })
 
-const metadata = {
-  name: 'blokiox',
-  description: 'AppKit Example',
-  url: 'https://reown.com/appkit',
-  icons: ['https://assets.reown.com/reown-profile-pic.png']
-}
+connectButton.addEventListener("click", async () => {
+  try {
+    // Solicita conexão
+    await provider.enable()
 
-const modal = createAppKit({
-  adapters: [wagmiAdapter],
-  networks,
-  metadata,
-  projectId,
-  features: {
-    analytics: true
+    const accounts = await provider.request({ method: "eth_accounts" })
+
+    if (accounts.length > 0) {
+      addressDisplay.textContent = `Carteira: ${accounts[0]}`
+    } else {
+      addressDisplay.textContent = "Nenhuma carteira conectada"
+    }
+  } catch (error) {
+    console.error("Erro ao conectar:", error)
+    addressDisplay.textContent = "Erro ao conectar"
   }
-})
-
-document.addEventListener('DOMContentLoaded', () => {
-  const openConnectModalBtn = document.getElementById('open-connect-modal')
-  const openNetworkModalBtn = document.getElementById('open-network-modal')
-
-  openConnectModalBtn?.addEventListener('click', () => modal.open())
-  openNetworkModalBtn?.addEventListener('click', () => modal.open({ view: 'Networks' }))
 })
