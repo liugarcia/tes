@@ -1,18 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Conectar Carteira</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body>
-    <h1>Conectar Carteira com WalletConnect</h1>
-    <button id="connect-btn">Conectar Carteira</button>
-    <p id="wallet-address">Carteira não conectada</p>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Conectar Carteira</title>
+</head>
+<body>
+  <h2>Conexão via WalletConnect</h2>
+  <button id="connect-btn">Conectar Carteira</button>
+  <p id="wallet-address">Carteira: Não conectada</p>
 
-    <!-- Carregando Web3Modal via CDN -->
-    <script src="https://unpkg.com/web3modal@2.5.1/dist/index.umd.js"></script>
-    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <script src="main.js" type="module"></script>
-  </body>
+  <script type="module" src="main.js"></script>
+</body>
 </html>
